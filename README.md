@@ -1,2 +1,2 @@
 # torcs
-Copy of the TORCS race simulator with minor changes.
+Copy of the TORCS race simulator and the gym environment to make it compatible with Gymnasium.
