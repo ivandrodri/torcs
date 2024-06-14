@@ -1,0 +1,2 @@
+TORCS_BASE = /home/ivan/Documents/GIT_PROJECTS/torcs_gymnasium/src/torcs
+MAKE_DEFAULT = /home/ivan/Documents/GIT_PROJECTS/torcs_gymnasium/src/torcs/Make-default.mk
