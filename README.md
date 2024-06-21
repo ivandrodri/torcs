@@ -47,13 +47,35 @@ bash install_torcs.sh
 To run this project using Docker, make sure you have Docker installed on your system. If not, you can download and install Docker from [Docker's official website](https://www.docker.com/get-started).
 
 1. **Build the Docker image**:
+   
+   **Note**: If you already build torcs outside docker please clean the torcs project as it is a bit dirty, and it will interfere with torcs building in docker: 
+   ```
+   cd src/torcs
+   rm -rf BUILD
+   make clean
+   ``` 
 
    Navigate to the root directory of the project where `Dockerfile` is located, then run:
 
    ```bash
    docker build -t torcs-simulator .
-   docker run -it --rm torcs-simulator
    ```
+
+   and run docker using: 
+
+   ```shell
+   docker run -it --rm --privileged --net=host \
+      --env DISPLAY --volume /tmp/.X11-unix:/tmp/.X11-unix \
+      torcs-simulator bash
+   ```
+
+   In case you experience some issues with the rendering when using docker
+   make sure to add the docker user to xhost. So run on your local machine: 
+
+   ```shell
+   xhost +SI:localuser:docker_user
+   ```
+
 
 ## Usage
 

@@ -17,11 +17,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 ENV PATH="${POETRY_HOME}/bin:$PATH"
 
+# ToDo: Delete unnecessary dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl make \
-    pandoc git-lfs rsync ffmpeg x11-xserver-utils patchelf libglew-dev  \
-    make g++ gdb libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev  \
+    pandoc git-lfs rsync ffmpeg  make g++ gdb\
+    x11-xserver-utils patchelf libglew-dev  \
+    libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev  \
     libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libosmesa6-dev \
     libxrender-dev libxrandr-dev libpng-dev libxxf86vm-dev libvorbis-dev xautomation\
     && rm -rf /var/lib/apt/lists/*
@@ -44,6 +46,7 @@ ENV CFLAGS="-fPIC"
 ENV CPPFLAGS=$CFLAGS
 ENV CXXFLAGS=$CFLAGS
 RUN make clean
+RUN rm -rf BUILD
 RUN ./configure --prefix=$(pwd)/BUILD
 RUN make
 RUN make install
@@ -62,9 +65,11 @@ ENV DEBIAN_FRONTEND=noninteractive\
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONFAULTHANDLER=1 \
+    POETRY_HOME="/opt/poetry" \
     CODE_DIR=$CODE_DIR
 
 ENV PATH="${CODE_DIR}/.venv/bin:$PATH"
+ENV PATH="${CODE_DIR}/src/torcs/BUILD/bin:$PATH"
 
 # pandoc needed for docs, see https://nbsphinx.readthedocs.io/en/0.7.1/installation.html?highlight=pandoc#pandoc
 # gh-pages action uses rsync
@@ -74,10 +79,20 @@ RUN touch ~/.Xauthority
 
 WORKDIR ${CODE_DIR}
 
-# Copy virtual environment from base image
+# ToDo: Delete unnecessary dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    x11-xserver-utils patchelf libglew-dev  \
+    libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev  \
+    libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libosmesa6-dev \
+    libxrender-dev libxrandr-dev libpng-dev libxxf86vm-dev libvorbis-dev xautomation\
+    && rm -rf /var/lib/apt/lists/*
+
+#RUN curl -sSL https://install.python-poetry.org | python -
+
 COPY --from=BASE ${CODE_DIR}/.venv ${CODE_DIR}/.venv
-# Copy built package from base image
 COPY --from=BASE ${CODE_DIR}/dist ${CODE_DIR}/dist
+COPY --from=BASE ${CODE_DIR}/src/torcs/BUILD ${CODE_DIR}/src/torcs/BUILD
 
 VOLUME "$CODE_DIR"/src/torcs/BUILD
 
@@ -85,10 +100,17 @@ WORKDIR "${HOME}"
 
 COPY  . $CODE_DIR
 
-# Move to the code dir to install dependencies as the CODE_DIR contains the
-# complete code base, including the poetry.lock file
-#WORKDIR $CODE_DIR
+# Ensure Poetry is available
+ENV PATH="${POETRY_HOME}/bin:$PATH"
+COPY --from=BASE ${POETRY_HOME} ${POETRY_HOME}
 
-RUN pip install --no-cache-dir dist/*.whl
+# Install Python dependencies for MAIN stage using Poetry
+#RUN pip install --no-cache-dir poetry
+RUN curl -sSL https://install.python-poetry.org | python -
+#RUN python poetry_install.py
+RUN poetry install --no-interaction --no-ansi --no-root --only main
+RUN poetry install --no-interaction --no-ansi --no-root --with add1
+RUN poetry install --no-interaction --no-ansi --no-root --with add2
 
-
+#ToDo: Try with WORKDIR "${HOME}" and WORKDIR "${CODE_DIR}"
+#RUN pip install --no-cache-dir dist/*.whl

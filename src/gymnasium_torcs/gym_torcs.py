@@ -7,14 +7,12 @@ import numpy as np
 import copy
 import os
 import time
-import src
 
 
 class TorcsEnv (Env):
 
-    src_path = os.path.dirname(os.path.abspath(src.__file__))
-    gym_torcs_path = os.path.join(src_path, "gymnasium_torcs")
-    torcs_path = os.path.join(src_path, "torcs")
+    gym_torcs_path = os.path.dirname(os.path.abspath(__file__))
+    torcs_path = os.path.join(gym_torcs_path, "..", "torcs")
     torcs_exec_path = os.path.join(torcs_path, "BUILD", "bin", "torcs")
 
     terminal_judge_start = 500  # Speed limit is applied after this step

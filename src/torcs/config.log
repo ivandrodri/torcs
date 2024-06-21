@@ -28,7 +28,8 @@ uname -v = #35~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May  7 09:00:52 UTC 2
 /bin/universe          = unknown
 
 PATH: /home/ivan/google-cloud-sdk/bin
-PATH: /home/ivan/miniconda3/bin
+PATH: /home/ivan/miniconda3/envs/torcs_standalone/bin
+PATH: /home/ivan/miniconda3/condabin
 PATH: /usr/local/cuda-12.3/bin
 PATH: /usr/local/sbin
 PATH: /usr/local/bin
