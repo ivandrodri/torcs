@@ -104,13 +104,8 @@ COPY  . $CODE_DIR
 ENV PATH="${POETRY_HOME}/bin:$PATH"
 COPY --from=BASE ${POETRY_HOME} ${POETRY_HOME}
 
-# Install Python dependencies for MAIN stage using Poetry
-#RUN pip install --no-cache-dir poetry
 RUN curl -sSL https://install.python-poetry.org | python -
 #RUN python poetry_install.py
 RUN poetry install --no-interaction --no-ansi --no-root --only main
 RUN poetry install --no-interaction --no-ansi --no-root --with add1
 RUN poetry install --no-interaction --no-ansi --no-root --with add2
-
-#ToDo: Try with WORKDIR "${HOME}" and WORKDIR "${CODE_DIR}"
-#RUN pip install --no-cache-dir dist/*.whl
